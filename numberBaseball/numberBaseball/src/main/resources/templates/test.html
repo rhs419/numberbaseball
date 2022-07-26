@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>테스트용 화면입니다.</title>
+</head>
+<body>
+    <h1 th:text="aaaa">기본 메시지</h1>
+    <div th:each="test : ${testList}">
+        <span th:text="${test.test1}"></span>
+        <span th:text="${test.test2}"></span>
+    </div>
+</body>
+</html>
