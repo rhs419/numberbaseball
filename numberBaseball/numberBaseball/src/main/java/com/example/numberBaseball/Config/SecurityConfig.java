@@ -1,4 +1,4 @@
-package com.example.numberBaseball.Security;
+package com.example.numberBaseball.Config;
 import lombok.RequiredArgsConstructor;
 
 
@@ -35,17 +35,16 @@ public class SecurityConfig {
         
         http
             .authorizeRequests()
-                .antMatchers( "/login", "/singUp", "/access_denied", "/resources/**").permitAll() // 로그인 권한은 누구나, resources파일도 모든권한
+                .antMatchers( "/login", "/signUp", "/access_denied", "/resources/**").permitAll() // 로그인 권한은 누구나, resources파일도 모든권한
                 // USER, ADMIN 접근 허용
-                .antMatchers("/userAccess").hasRole("USER")
-                .antMatchers("/userAccess").hasRole("ADMIN")
+                .anyRequest().authenticated()
                 .and()
             .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/login_proc")
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/user_access")
+                .defaultSuccessUrl("/game")
                 .failureUrl("/access_denied") // 인증에 실패했을 때 보여주는 화면 url, 로그인 form으로 파라미터값 error=true로 보낸다.
                 .and()
             .csrf().disable();		//로그인 창

@@ -1,6 +1,5 @@
 package com.example.numberBaseball.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,10 +8,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.example.numberBaseball.model.Member;
 import com.example.numberBaseball.service.MemberService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Controller
 public class SignController {
-    @Autowired
-    private MemberService userService;
+    
+    private final MemberService userService;
 
     /**
      * 로그인 폼
@@ -29,6 +31,7 @@ public class SignController {
      */
     @GetMapping("/signUp")
     public String signUpForm() {
+        System.out.println("aa");
         return "sign/signup";
     }
 

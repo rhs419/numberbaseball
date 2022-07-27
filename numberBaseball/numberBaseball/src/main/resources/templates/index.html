@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>개발중</title>
+</head>
+<body>
+    <button class="topLink" onclick="location.href='game'" th:if="${session.loginMember == null}">회원가입</button>
+    <p th:text="${#authentication.name}"></p>
+</body>
+</html>

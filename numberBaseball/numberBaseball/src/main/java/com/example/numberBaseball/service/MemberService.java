@@ -28,7 +28,6 @@ public class MemberService implements UserDetailsService{
 
     @Transactional
     public void joinUser(Member member){
-        System.out.println(passwordEncoder.encode(member.getPassword()).toString()+""+passwordEncoder.encode(member.getPassword()).toString().equals("$2a$10$uQVket4ZpYyqnaiPVJWzcutQ.irsItLy.4Ly1a9255zGMfniWFjpS"));
         member.setUserPw(passwordEncoder.encode(member.getPassword()));
         member.setUserAuth("USER");
         userMapper.saveUser(member);
