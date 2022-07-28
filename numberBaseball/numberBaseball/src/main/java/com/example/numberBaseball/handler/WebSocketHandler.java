@@ -11,15 +11,24 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import com.example.numberBaseball.command.Test;
+import com.example.numberBaseball.command.NumberBaseball;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 
 @Component
 public class WebSocketHandler extends TextWebSocketHandler {
 	
 	private List<WebSocketSession> users = new ArrayList<WebSocketSession>();
-	private Map<String, Object> userMap = new HashMap<String,Object>();
-	
+	private Map<String, UserInfo> userMap = new HashMap<String,UserInfo>();
+
+	@Data
+	@AllArgsConstructor
+	class UserInfo{
+		String number;
+		Object obj;
+	}
 	
 	@Override
         //소켓 연결 생성 후 실행 메서드
@@ -40,26 +49,34 @@ public class WebSocketHandler extends TextWebSocketHandler {
 			//등록 요청 메시지
 			String user = object.getString("userid");
 			//아이디랑 Session이랑 매핑 >>> Map
-			userMap.put(user, session);
-		}
-        else if(type.equals("lose")){
+			userMap.put(user, new UserInfo("", session));
+		}else if(type != null && type.equals("numberRegister") ) {
+			String user = object.getString("userid");
+			String number = object.getString("userNumber");
+			//아이디랑 Session이랑 매핑 >>> Map
+			userMap.get(user).setNumber(number);;
+		}else if(type.equals("lose")){
 			String target = object.getString("target");
-			WebSocketSession ws = (WebSocketSession)userMap.get(target);
+			WebSocketSession ws = (WebSocketSession)userMap.get(target).getObj();
 			String msg = object.getString("message");
             ws.sendMessage(new TextMessage(msg));
-        }else {
-			//채팅 메시지 : 상대방 아이디를 포함해서 메시지를 보낼것이기 때문에
-			//Map에서 상대방 아이디에 해당하는 WebSocket 꺼내와서 메시지 전송
+        }else if(type.equals("answer")){
 			String target = object.getString("target");
-			WebSocketSession ws = (WebSocketSession)userMap.get(target);
+			String user = object.getString("userid");
+			WebSocketSession ws = (WebSocketSession)userMap.get(target).getObj();
+			WebSocketSession rws = (WebSocketSession)userMap.get(user).getObj();
 			String msg = object.getString("message");
             String from = object.getString("userid");
-			if(ws !=null ) {
-                if(Test.test(msg).equals("3S"))
-                    ws.sendMessage(new TextMessage(from+" Win"));
-                else
-				    ws.sendMessage(new TextMessage(from+" : "+msg+"\n"+Test.test(msg)));
-			}
+			if(type.equals("answer")){
+				if(ws !=null ) {
+					rws.sendMessage(new TextMessage(NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(user).getNumber()), NumberBaseball.stringToIntList(msg))));
+					if(NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg)).equals("3S"))
+						ws.sendMessage(new TextMessage(from+" Win"));
+					else
+						ws.sendMessage(new TextMessage(from+" : "+msg+"\n"+NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg))));
+				}
+			}else if(type.equals("chat"))
+				ws.sendMessage(new TextMessage(from+" : "+msg));
 		}
 	}
 

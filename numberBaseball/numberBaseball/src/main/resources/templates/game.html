@@ -35,7 +35,7 @@
 			width: 330px;
 			height: 25px;
 		}
-		#yourMsg{
+		#yourAnswer{
 			display: none;
 		}
 	</style>
@@ -68,16 +68,16 @@
 						lose();
 						$("#chating").append("<p style='text-align:center;'>You Lose!</p>");
 						gameOver();
-					}
+					}	
 				}
 			}
 		}
 
-		document.addEventListener("keypress", function(e){
+		/*document.addEventListener("keypress", function(e){
 			if(e.keyCode == 13){ //enter press
 				send();
 			}
-		});
+		});*/
 	}
 
 	function gameOver(){
@@ -101,7 +101,7 @@
 			$("#userName").focus();
 		}else{
 			$("#yourName").hide();
-			$("#yourMsg").show();
+			$("#yourAnswer").show();
 		}
 	}
 
@@ -110,6 +110,16 @@
 		var msg = {
 			type : "register", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
 			userid : [[${#authentication.name}]]
+		};
+		ws.send(JSON.stringify(msg));
+	}
+
+	function numberRegister() { //메시지 수신을 위한 서버에 id 등록하기
+		console.log("numberRegister");
+		var msg = {
+			type : "numberRegister", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
+			userid : [[${#authentication.name}]],
+			userNumber : $("#myNumber").val();
 		};
 		ws.send(JSON.stringify(msg));
 	}
@@ -125,12 +135,26 @@
 		ws.send(JSON.stringify(msg));
 	}
 
+	function sendAnswer() {
+		let num = $("#answering").val();
+		console.log("sendAnswer");
+			var msg = {
+				type : "answer", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
+				userid : [[${#authentication.name}]],
+				target : $("#userName").val(),
+				message : $("#answering").val()
+			};
+			ws.send(JSON.stringify(msg));
+			$("#chating").append("<p style='text-align: right;'>"+"나 : " + $("#answering").val() + "</p>");
+			$('#answering').val("");
+	};
+
 	function sendMsg() {
 		console.log("sendMsg");
 		var msg = {
 			type : "chat", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
 			userid : [[${#authentication.name}]],
-			target : $("#userName").val(),
+			target : "test",//$("#userName").val(),
 			message : $("#chatting").val()
 		};
 		ws.send(JSON.stringify(msg));
@@ -153,17 +177,25 @@
 			<table class="inputTable">
 				<tr>
 					<th>사용자명</th>
-					<th><input type="text" name="targetUser" id="userName"></th>
+					<th><input type="text" name="myNumber" id="userName"></th>
 					<th><button onclick="chatName()" id="startBtn">이름 등록</button></th>
+				</tr>
+			</table>
+		</div>
+		<div id="yourAnswer">
+			<table class="inputTable">
+				<tr>
+					<th><input type="text" 
+						oninput="this.value = this.value.replace(/[^1-9.]/g, '').replace(/(\..*)\./g, '$1');" minlength="3"maxlength="3" id="answering" placeholder="답을 유추해주세요." ></th>
+					<th><button onclick="sendAnswer()" class="sendBtn">보내기</button></th>
 				</tr>
 			</table>
 		</div>
 		<div id="yourMsg">
 			<table class="inputTable">
 				<tr>
-					<th>메시지</th>
-					<th><input id="chatting" placeholder="보내실 메시지를 입력하세요."></th>
-					<th><button onclick="sendMsg()" id="sendBtn">보내기</button></th>
+					<th><input id="chatting" placeholder="채팅을 입력해주세요" ></th>
+					<th><button onclick="sendMsg()" class="sendBtn">보내기</button></th>
 				</tr>
 			</table>
 		</div>
