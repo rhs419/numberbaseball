@@ -6,7 +6,10 @@ xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <title>개발중</title>
 </head>
 <body>
-    <button class="topLink" onclick="location.href='game'" th:if="${session.loginMember == null}">회원가입</button>
+    <form action="/game" method="get">
+        <button type="submit">회원가입</button>
+        <input type="text" name = "targetUser"/>
+    </form>
     <p th:text="${#authentication.name}"></p>
 </body>
 </html>

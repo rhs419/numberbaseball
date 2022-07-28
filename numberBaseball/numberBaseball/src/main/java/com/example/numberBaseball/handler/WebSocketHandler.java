@@ -69,7 +69,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             String from = object.getString("userid");
 			if(type.equals("answer")){
 				if(ws !=null ) {
-					rws.sendMessage(new TextMessage(NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(user).getNumber()), NumberBaseball.stringToIntList(msg))));
+					rws.sendMessage(new TextMessage("<p style='text-align : right;'>"+NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg))+"</p>"));
 					if(NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg)).equals("3S"))
 						ws.sendMessage(new TextMessage(from+" Win"));
 					else

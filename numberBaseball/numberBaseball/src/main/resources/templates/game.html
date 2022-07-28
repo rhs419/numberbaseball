@@ -58,20 +58,25 @@
 		
 		ws.onmessage = function(data) {
 			var msg = data.data;
-			if(msg != null && msg.trim() != ''){
-				if(msg=="You Win!"){
-					$("#chating").append("<p style='text-align:center;'>" + msg + "</p>");
-					gameOver();
-				}else{
-				$("#chating").append("<p>" + msg + "</p>");
-					if(msg.slice(msg.length-3)=="Win"){
-						lose();
-						$("#chating").append("<p style='text-align:center;'>You Lose!</p>");
+			if(msg != null && msg.trim() != '')
+				if(msg.slice(msg.length-4)=="</p>")
+					$("#chating").append(msg);
+					else{
+					if(msg=="You Win!"){
+						$("#chating").append("<p style='text-align:center;'>" + msg + "</p>");
 						gameOver();
-					}	
+					}else{
+					$("#chating").append("<p>" + msg + "</p>");
+						if(msg.slice(msg.length-3)=="Win"){
+							lose();
+							$("#chating").append("<p style='text-align:center;'>You Lose!</p>");
+							gameOver();
+						}	
+					}
+					$("#answerBtn").removeAttr("disabled");
 				}
 			}
-		}
+		
 
 		/*document.addEventListener("keypress", function(e){
 			if(e.keyCode == 13){ //enter press
@@ -95,13 +100,21 @@
 	}
 
 	function chatName(){
-		var userName = $("#userName").val();
-		if(userName == null || userName.trim() == ""){
-			alert("사용자 이름을 입력해주세요.");
-			$("#userName").focus();
-		}else{
-			$("#yourName").hide();
-			$("#yourAnswer").show();
+		let num = $("#myNumber").val().trim();
+        var numberList = num.split("");
+        if(numberList.length<3||numberList[0]==numberList[1]||numberList[1]==numberList[2]||numberList[2]==numberList[0]){
+            alert("서로 다른 3자리 숫자를 입력해주세요.");
+            $("#userNumber").focus();
+        }else{
+			var myNumber = $("#myNumber").val();
+			if(myNumber == null || myNumber.trim() == ""){
+				alert("사용자 이름을 입력해주세요.");
+				$("#myNumber").focus();
+			}else{
+				numberRegister();
+				$("#yourName").hide();
+				$("#yourAnswer").show();
+			}
 		}
 	}
 
@@ -116,12 +129,12 @@
 
 	function numberRegister() { //메시지 수신을 위한 서버에 id 등록하기
 		console.log("numberRegister");
-		var msg = {
-			type : "numberRegister", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
-			userid : [[${#authentication.name}]],
-			userNumber : $("#myNumber").val();
-		};
-		ws.send(JSON.stringify(msg));
+			var msg = {
+				type : "numberRegister", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
+				userid : [[${#authentication.name}]],
+				userNumber : $("#myNumber").val()
+			};
+			ws.send(JSON.stringify(msg));
 	}
 
 	function lose() { //메시지 수신을 위한 서버에 id 등록하기
@@ -129,24 +142,32 @@
 		var msg = {
 			type : "lose", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
 			userid : [[${#authentication.name}]],
-			target : $("#userName").val(),
+			target : [[${targetUser}]],
 			message : "You Win!"
 		};
 		ws.send(JSON.stringify(msg));
 	}
 
 	function sendAnswer() {
+		let num = $("#answering").val().trim();
+        var numberList = num.split("");
+        if(numberList.length<3||numberList[0]==numberList[1]||numberList[1]==numberList[2]||numberList[2]==numberList[0]){
+            alert("서로 다른 3자리 숫자를 입력해주세요.");
+            $("#userNumber").focus();
+        }else{
 		let num = $("#answering").val();
 		console.log("sendAnswer");
 			var msg = {
 				type : "answer", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
 				userid : [[${#authentication.name}]],
-				target : $("#userName").val(),
+				target : [[${targetUser}]],
 				message : $("#answering").val()
 			};
 			ws.send(JSON.stringify(msg));
 			$("#chating").append("<p style='text-align: right;'>"+"나 : " + $("#answering").val() + "</p>");
 			$('#answering').val("");
+			$("#answerBtn").attr("disabled", true);
+		}
 	};
 
 	function sendMsg() {
@@ -154,7 +175,7 @@
 		var msg = {
 			type : "chat", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
 			userid : [[${#authentication.name}]],
-			target : "test",//$("#userName").val(),
+			target : [[${targetUser}]],
 			message : $("#chatting").val()
 		};
 		ws.send(JSON.stringify(msg));
@@ -176,9 +197,10 @@
 		<div id="yourName">
 			<table class="inputTable">
 				<tr>
-					<th>사용자명</th>
-					<th><input type="text" name="myNumber" id="userName"></th>
-					<th><button onclick="chatName()" id="startBtn">이름 등록</button></th>
+					<th>정답숫자</th>
+					<th><input type="text"
+						oninput="this.value = this.value.replace(/[^1-9.]/g, '').replace(/(\..*)\./g, '$1');"maxlength="3"  name="myNumber" id="myNumber"></th>
+					<th><button onclick="chatName()" id="startBtn">숫자 등록</button></th>
 				</tr>
 			</table>
 		</div>
@@ -186,8 +208,8 @@
 			<table class="inputTable">
 				<tr>
 					<th><input type="text" 
-						oninput="this.value = this.value.replace(/[^1-9.]/g, '').replace(/(\..*)\./g, '$1');" minlength="3"maxlength="3" id="answering" placeholder="답을 유추해주세요." ></th>
-					<th><button onclick="sendAnswer()" class="sendBtn">보내기</button></th>
+						oninput="this.value = this.value.replace(/[^1-9.]/g, '').replace(/(\..*)\./g, '$1');"maxlength="3" id="answering" placeholder="답을 유추해주세요." ></th>
+					<th><button onclick="sendAnswer()" id="answerBtn" class="sendBtn">보내기</button></th>
 				</tr>
 			</table>
 		</div>
