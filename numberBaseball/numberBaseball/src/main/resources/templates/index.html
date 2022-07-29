@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<meta charset="UTF-8">
+<title>로비</title>
+</head>
+<script>
+    function wsOpen(){
+		ws = new WebSocket("ws://" + location.host + "/gaming");
+		wsEvt();
+	}
+		
+	function wsEvt() {
+		ws.onopen = function(data){
+			console.log('연결 생성');
+			register();
+			//소켓이 열리면 초기화 세팅하기
+		}
+
+        function register() { //메시지 수신을 위한 서버에 id 등록하기
+            console.log("register");
+            var msg = {
+                type : "register", //메시지 구분하는 구분자 - 상대방 아이디와 메시지 포함해서 보냄
+                userid : "[[${#authentication.name}]]"
+            };
+            ws.send(JSON.stringify(msg));
+        }
+		
+		ws.onmessage = function(data) {
+			var msg = data.data;
+			if(msg != null && msg.trim() != ''){
+                location.href="/game?targetUser="+msg;
+                    //if(confirm(msg+ "와 게임 하시겠습니까?")==true)
+                    //    $('#enter').submit();
+                    
+            }
+		}
+	}
+    function challenge() { 
+        console.log("challenge");
+        var msg = {
+            type : "challenge", 
+            userid : "[[${#authentication.name}]]",
+            target : $('#targetName').val()
+        };
+        ws.send(JSON.stringify(msg));
+        $('#enter').submit();
+    }
+
+    $(function(){
+		wsOpen();
+	});
+</script>
+<body>
+    <p th:text="${#authentication.name}" id="enter"></p>
+    <form action="/game" method="get">
+        <button onclick="challenge()">게임입장</button>
+        <input type="text" name = "targetUser" id="targetName"/>
+    </form>
+    <ul th:each="user : ${userList}">
+            <li th:text="${user}"></li>
+    </ul>
+</body>
+</html>
