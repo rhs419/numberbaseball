@@ -3,7 +3,7 @@
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <meta charset="UTF-8">
-	<title>Chating</title>
+	<title>숫자야구</title>
 	<style>
 		*{
 			margin:0;
@@ -55,10 +55,11 @@
 			register();
 			//소켓이 열리면 초기화 세팅하기
 		}
-		
 		ws.onmessage = function(data) {
 			var msg = data.data;
-			if(msg != null && msg.trim() != '')
+			if(msg==[[${targetUser}]]+" : geojeol"){
+				alert("거절되었습니다.");
+			}else if(msg != null && msg.trim() != '')
 				if(msg.slice(msg.length-4)=="</p>")
 					$("#chating").append(msg);
 					else{

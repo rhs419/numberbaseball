@@ -10,7 +10,6 @@ public class GameController {
 	
 	@RequestMapping("/game")
 	public ModelAndView chat(@RequestParam(value="targetUser", defaultValue="test")String targetUser) {
-		System.out.println(targetUser);
 		ModelAndView mv = new ModelAndView();
 		mv.addObject("targetUser", targetUser);
 		mv.setViewName("game");

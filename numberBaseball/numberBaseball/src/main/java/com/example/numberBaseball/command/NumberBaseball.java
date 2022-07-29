@@ -26,10 +26,11 @@ public class NumberBaseball {
 		}
 		if (strike == 0 && ball == 0)
 			result = "Out";
-		else if(strike != 0)
+		else {if(strike != 0)
 			result += strike + "S";
-            else if(ball != 0)
+            if(ball != 0)
             result+= ball + "B";
+		}
 		return result;
 	}
 }

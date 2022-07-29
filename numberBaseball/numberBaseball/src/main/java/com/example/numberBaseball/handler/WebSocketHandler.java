@@ -67,16 +67,25 @@ public class WebSocketHandler extends TextWebSocketHandler {
 			WebSocketSession rws = (WebSocketSession)userMap.get(user).getObj();
 			String msg = object.getString("message");
             String from = object.getString("userid");
-			if(type.equals("answer")){
-				if(ws !=null ) {
-					rws.sendMessage(new TextMessage("<p style='text-align : right;'>"+NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg))+"</p>"));
-					if(NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg)).equals("3S"))
-						ws.sendMessage(new TextMessage(from+" Win"));
-					else
-						ws.sendMessage(new TextMessage(from+" : "+msg+"\n"+NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg))));
-				}
-			}else if(type.equals("chat"))
-				ws.sendMessage(new TextMessage(from+" : "+msg));
+			if(ws !=null ) {
+				rws.sendMessage(new TextMessage("<p style='text-align : right;'>"+NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg))+"</p>"));
+				if(NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg)).equals("3S"))
+					ws.sendMessage(new TextMessage(from+" Win"));
+				else
+					ws.sendMessage(new TextMessage(from+" : "+msg+"\n"+NumberBaseball.compare(NumberBaseball.stringToIntList(userMap.get(target).getNumber()), NumberBaseball.stringToIntList(msg))));
+			}
+		}else if(type.equals("chat")){
+			String target = object.getString("target");
+			WebSocketSession ws = (WebSocketSession)userMap.get(target).getObj();
+			String msg = object.getString("message");
+            String from = object.getString("userid");
+			ws.sendMessage(new TextMessage(from+" : "+msg));
+		}else if(type.equals("challenge")){
+			String target = object.getString("target");
+			WebSocketSession ws = (WebSocketSession)userMap.get(target).getObj();
+            String from = object.getString("userid");
+			System.out.println(from);
+			ws.sendMessage(new TextMessage(from));
 		}
 	}
 
